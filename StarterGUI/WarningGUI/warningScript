@@ -1,0 +1,19 @@
+local warningLabel = script.Parent
+
+local Events = game:WaitForChild("ReplicatedStorage").Events
+
+Events.warning.OnClientEvent:Connect(function(warningText)
+	
+	warningLabel.Text = warningText
+	warningLabel.Visible = true
+	
+	if warningText ~= "A Side wins!" and warningText ~= "B Side wins!" then
+		
+		wait(2)
+
+		warningLabel.Visible = false
+		warningLabel.Text = ""
+		
+	end
+	
+end)
