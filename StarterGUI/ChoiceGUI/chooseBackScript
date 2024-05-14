@@ -1,0 +1,47 @@
+
+local chooseBack = script.Parent
+local GUI = script.Parent.Parent
+
+local currentMap = game.Workspace.currentMap
+
+chooseBack.MouseButton1Click:Connect(function()
+	
+	chooseBack.Visible = false
+	chooseBack.Active = false
+	
+	GUI.menuBack.Visible = true
+	GUI.menuBack.Active = true
+
+	GUI.buildFactoryButton.Visible = true
+	GUI.buildFactoryButton.Active = true
+
+	GUI.buildBarracksButton.Visible = true
+	GUI.buildBarracksButton.Active = true
+	
+	GUI.buildTurretButton.Visible = true
+	GUI.buildTurretButton.Active = true
+	
+	for i,v in pairs (currentMap.octaNodes:GetChildren()) do
+		if (v:GetAttribute("Greenified") == true) then
+			v.PrimaryPart.Color = v:GetAttribute("lastTeamColor")
+			v:SetAttribute("Greenified", false)
+			v.ClickDetector.MaxActivationDistance = 0
+		end
+	end
+
+	for i,v in pairs (currentMap.rectNodes:GetChildren()) do
+		if (v:GetAttribute("Greenified") == true) then
+			v.PrimaryPart.Color = v:GetAttribute("lastTeamColor")
+			v:SetAttribute("Greenified", false)
+			v.ClickDetector.MaxActivationDistance = 0
+		end
+	end
+	
+end)
+
+chooseBack.MouseEnter:Connect(function()
+	
+	chooseBack.ImageTransparency = 0.75
+	chooseBack.Transparency = 0.75
+	
+end)
