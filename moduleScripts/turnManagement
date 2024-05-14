@@ -386,8 +386,8 @@ local turnManagement = {}
 			buildingGenerator.tombstoneBuild(enemySoldier1.Armor.CFrame, enemyAllegiance)
 			buildingGenerator.tombstoneBuild(newSoldier1.Armor.CFrame, thisAllegiance)
 			
-			--enemySoldier1:Destroy()
-			--newSoldier1:Destroy()
+			enemySoldier1:Destroy()
+			newSoldier1:Destroy()
 
 			if enemyPopulation >= 2 and troopSpawns == 2 then
 				buildingGenerator.tombstoneBuild(enemySoldier2.Armor.CFrame, enemyAllegiance)
