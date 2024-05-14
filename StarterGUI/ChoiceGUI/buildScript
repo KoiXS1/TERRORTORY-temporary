@@ -1,0 +1,133 @@
+local BuildButton = script.Parent
+local GUI = script.Parent.Parent
+
+BuildButton.MouseButton1Click:Connect(function()
+	
+	GUI.menuBack.Visible = true
+	GUI.menuBack.Active = true
+	
+	GUI.buildFactoryButton.Visible = true
+	GUI.buildFactoryButton.Active = true
+	
+	GUI.buildBarracksButton.Visible = true
+	GUI.buildBarracksButton.Active = true
+	
+	GUI.buildTurretButton.Visible = true
+	GUI.buildTurretButton.Active = true
+	
+	GUI.passTurnButton.Visible = false
+	GUI.passTurnButton.Active = false
+	
+	BuildButton.Visible = false
+	BuildButton.Active = false
+	
+	--Entering Build Mode
+	
+	--SHOULD DEACTIVATE SOLDIER CLICKERS
+	
+	local currentMap = game.Workspace.currentMap
+	
+	for i,a in pairs (currentMap.octaNodes:GetChildren()) do
+		for i,b in pairs (a.PrimaryPart.Troops:GetChildren()) do
+			b.ClickDetector.MaxActivationDistance = 0
+		end
+	end
+	
+	for i,c in pairs (currentMap.rectNodes:GetChildren()) do
+		for i,d in pairs (c.PrimaryPart.Troops:GetChildren()) do
+			d.ClickDetector.MaxActivationDistance = 0
+		end
+	end
+
+end)
+
+BuildButton.MouseEnter:Connect(function()
+	BuildButton.ImageTransparency = 0.75
+	BuildButton.Transparency = 0.75
+end)
+
+BuildButton.MouseLeave:Connect(function()
+	BuildButton.ImageTransparency = 0
+	BuildButton.Transparency = 0
+end)
+
+
+-- For when the player does action in Movement Mode
+local troopDecisionStart = game.ReplicatedStorage.Events.troopDecisionStart
+local troopDecisionEnd = game.ReplicatedStorage.Events.troopDecisionEnd
+
+--Visibility changes
+troopDecisionStart.OnClientEvent:Connect(function()
+	
+	BuildButton.Visible = false
+	BuildButton.Active = false
+	
+end)
+
+troopDecisionEnd.OnClientEvent:Connect(function()
+
+	BuildButton.Visible = true
+	BuildButton.Active = true
+
+end)
+
+-- For when build mode ends via constructing.
+local buildDecisionEnd = game.ReplicatedStorage.Events.buildDecisionEnd
+buildDecisionEnd.OnClientEvent:Connect(function()
+	
+	local currentMap = game.Workspace.currentMap
+	
+	for i,v in pairs (currentMap.octaNodes:GetChildren()) do
+		if (v:GetAttribute("Greenified") == true) then
+			v.PrimaryPart.Color = v:GetAttribute("lastTeamColor")
+			v:SetAttribute("Greenified", false)
+			v.ClickDetector.MaxActivationDistance = 0
+		end
+	end
+
+	for i,v in pairs (currentMap.rectNodes:GetChildren()) do
+		if (v:GetAttribute("Greenified") == true) then
+			v.PrimaryPart.Color = v:GetAttribute("lastTeamColor")
+			v:SetAttribute("Greenified", false)
+			v.ClickDetector.MaxActivationDistance = 0
+		end
+	end
+	
+	BuildButton.Visible = true
+	BuildButton.Active = true
+	
+	GUI.menuBack.Visible = false
+	GUI.menuBack.Active = false
+
+	GUI.buildFactoryButton.Visible = false
+	GUI.buildFactoryButton.Active = false
+
+	GUI.buildBarracksButton.Visible = false
+	GUI.buildBarracksButton.Active = false
+	
+	GUI.chooseBack.Visible = false
+	GUI.chooseBack.Active = false
+	
+	--Should reactivate click detectors
+	local currentMap = game.Workspace.currentMap
+
+	for i,a in pairs (currentMap.octaNodes:GetChildren()) do
+		for i,b in pairs (a.PrimaryPart.Troops:GetChildren()) do
+			b.ClickDetector.MaxActivationDistance = 100
+		end
+	end
+
+	for i,c in pairs (currentMap.rectNodes:GetChildren()) do
+		for i,d in pairs (c.PrimaryPart.Troops:GetChildren()) do
+			d.ClickDetector.MaxActivationDistance = 100
+		end
+	end
+	
+end)
+
+local startTurn = game:GetService("ReplicatedStorage").Events.startTurn
+startTurn.OnClientEvent:Connect(function()
+	
+	GUI.Enabled = true
+	
+end)
