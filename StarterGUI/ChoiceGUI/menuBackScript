@@ -1,0 +1,54 @@
+local menuBack = script.Parent
+local GUI = script.Parent.Parent
+
+local buildDecisionEnd = game.ReplicatedStorage.Events.buildDecisionEnd
+
+menuBack.MouseButton1Click:Connect(function(player)
+
+	GUI.menuBack.Visible = false
+	GUI.menuBack.Active = false
+
+	GUI.buildFactoryButton.Visible = false
+	GUI.buildFactoryButton.Active = false
+
+	GUI.buildBarracksButton.Visible = false
+	GUI.buildBarracksButton.Active = false
+	
+	GUI.buildTurretButton.Visible = false
+	GUI.buildTurretButton.Active = false
+
+	GUI.buildModeBegin.Visible = true
+	GUI.buildModeBegin.Active = true
+	
+	GUI.passTurnButton.Visible = true
+	GUI.passTurnButton.Active = true
+	
+	--Exiting Build Mode
+
+	_G.decisionType = ""
+	
+	local currentMap = game.Workspace.currentMap
+
+	for i,a in pairs (currentMap.octaNodes:GetChildren()) do
+		for i,b in pairs (a.PrimaryPart.Troops:GetChildren()) do
+			b.ClickDetector.MaxActivationDistance = 500
+		end
+	end
+
+	for i,c in pairs (currentMap.rectNodes:GetChildren()) do
+		for i,d in pairs (c.PrimaryPart.Troops:GetChildren()) do
+			d.ClickDetector.MaxActivationDistance = 500
+		end
+	end
+
+end)
+
+menuBack.MouseEnter:Connect(function()
+	menuBack.ImageTransparency = 0.75
+	menuBack.Transparency = 0.75
+end)
+
+menuBack.MouseLeave:Connect(function()
+	menuBack.ImageTransparency = 0
+	menuBack.Transparency = 0
+end)
