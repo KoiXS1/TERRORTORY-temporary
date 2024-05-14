@@ -1,0 +1,12 @@
+--Script that creates a rainy environment.
+local RepSto = game:GetService("ReplicatedStorage")
+
+--Creates the ambience of the rain.
+RepSto["Global Sounds"].Rain:Play()
+
+RepSto.Events.endGame.OnClientEvent:Connect(function()
+	RepSto["Global Sounds"].Rain:Stop()
+end)
+
+--Creates the particle effects of the rain.
+local rainLoop = true
