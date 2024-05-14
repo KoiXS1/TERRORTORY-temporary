@@ -1,0 +1,9 @@
+local GUI = script.Parent
+
+local Events = game:GetService("ReplicatedStorage").Events
+
+Events.endGame.OnClientEvent:Connect(function()
+	
+	GUI.Enabled = false
+	
+end)
