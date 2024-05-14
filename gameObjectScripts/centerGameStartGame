@@ -1,0 +1,29 @@
+local gameManagement = require(game:getService("ReplicatedStorage").gameManagement)
+local mapGenerators = require(game:GetService("ReplicatedStorage").mapGenerators)
+local Teams = game:GetService("Teams")
+local Players = game:GetService("Players")
+
+script.Parent.ClickDetector.MouseClick:Connect(function(plr)
+	
+	--Destroys the entire selection area to prevent duplication in map generation.
+	local selectionArea = game.Workspace["Selection Area"]
+	for i, v in pairs (selectionArea:GetChildren()) do
+		v:Destroy()
+	end
+	
+	local APlayerName
+	local BPlayerName = "PlaceHolderName"
+	
+	for i, v in pairs(Teams.A:GetPlayers()) do
+		APlayerName = v.Name
+		print ("Clicked! Clicker: "..v.Name)
+	end
+	
+	for i,v in pairs (Players:GetPlayers()) do
+		v:LoadCharacter()
+	end
+	
+	gameManagement.startGame(APlayerName, BPlayerName , "centerGame")
+	mapGenerators.generateDecor("Center Game")
+	
+end)
