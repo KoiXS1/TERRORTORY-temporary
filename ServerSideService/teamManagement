@@ -1,0 +1,13 @@
+local Players = game:GetService("Players")
+
+local Teams = game:GetService("Teams")
+
+Players.PlayerAdded:Connect(function(player)
+
+	if (#Players:GetPlayers() % 2 == 0) then
+		player.Team = Teams.B
+	elseif (#Players:GetPlayers() % 2 == 1) then
+		player.Team = Teams.A
+	end
+
+end)
