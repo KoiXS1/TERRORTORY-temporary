@@ -1,0 +1,37 @@
+local GUI = script.Parent.Parent
+
+local troopDecisionEnd = game.ReplicatedStorage.Events.troopDecisionEnd
+
+local currentMap = game.Workspace.currentMap
+
+revokeButton.MouseButton1Click:Connect(function()
+	
+	troopDecisionEnd:FireServer()
+	
+	GUI.buildModeBegin.Visible = true
+	GUI.buildModeBegin.Active = true
+	
+	GUI.passTurnButton.Visible = true
+	GUI.passTurnButton.Active = true
+	
+end)
+
+revokeButton.MouseEnter:Connect(function()
+	revokeButton.ImageTransparency = 0.75
+	revokeButton.Transparency = 0.75
+end)
+
+revokeButton.MouseLeave:Connect(function()
+	revokeButton.ImageTransparency = 0
+	revokeButton.Transparency = 0
+end)
+
+troopDecisionStart.OnClientEvent:Connect(function()
+	revokeButton.Visible = true
+	revokeButton.Active = true
+end)
+
+troopDecisionEnd.OnClientEvent:Connect(function()
+	revokeButton.Visible = false
+	revokeButton.Active = false
+end)re
