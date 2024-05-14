@@ -1,0 +1,322 @@
+local gameManagement = {}
+
+	local mapGenerator = require(game:getService("ReplicatedStorage").mapGenerators)
+	local buildingGenerators = require(game:getService("ReplicatedStorage").buildingGenerator)
+	local turnManagement = require(game:getService("ReplicatedStorage").turnManagement)
+	-- We use require(game:GetService(serviceName).moduleScript) instead of
+	-- game.Service.moduleScript as the syntax to the left can cause errors in loading.
+
+	-- require() is also used in general to load modulescripts from a service.
+
+	local Teams = game:GetService("Teams")
+	local RepSto = game:GetService("ReplicatedStorage")
+	local Events = RepSto.Events
+
+	--Function that promptly starts a game between 2 players and generates a map.
+	function gameManagement.startGame(player1, player2, mapName)
+	
+		local aSideBase
+		local bSideBase
+
+		local AactualPlayer = game.Players:FindFirstChild(player1)
+		local BactualPlayer = game.Players:FindFirstChild(player2)
+
+		_G.ASidePlayer = player1
+		_G.BSidePlayer = player2
+
+		-- Loads the map itself  
+		if mapName == "openField" then
+			
+			aSideBase = "Octa4"
+			bSideBase = "Octa8"
+		
+			local baseInfo = RepSto.baseInfo
+			baseInfo.ASideBase.Value = "Octa4"
+			baseInfo.BSideBase.Value = "Octa8"
+		
+			mapGenerator.constructOpenField()
+		
+		elseif mapName == "centerGame" then
+		
+			aSideBase = "Octa4"
+			bSideBase = "Octa8"
+
+			local baseInfo = RepSto.baseInfo
+			baseInfo.ASideBase.Value = "Octa4"
+			baseInfo.BSideBase.Value = "Octa8"
+		
+			mapGenerator.constructCenterGame()
+		
+		elseif mapName == "theRing" then
+
+			aSideBase = "Octa4"
+			bSideBase = "Octa8"
+
+			local baseInfo = RepSto.baseInfo
+			baseInfo.ASideBase.Value = "Octa4"
+			baseInfo.BSideBase.Value = "Octa8"
+
+			mapGenerator.constructTheRing()
+
+		end
+	
+		wait(0.05) --Gives time for the nodes to load so we can then change the node colors of the base.
+	
+		--Gives the necessary attributes for the base octagonal nodes.
+		for i, v in pairs (game.Workspace.currentMap.octaNodes:GetChildren()) do
+			if v.Name == aSideBase then
+				v:SetAttribute("lastTeamColor",Color3.fromRGB(255, 186, 8))
+				v.PrimaryPart.Color = Color3.fromRGB(255, 186, 8)
+			elseif v.Name == bSideBase then
+				v:SetAttribute("lastTeamColor", Color3.fromRGB(52, 84, 209))
+				v.PrimaryPart.Color = Color3.fromRGB(52, 84, 209)
+			end
+		end
+	
+		--Creates the space for the AChips and BChips value to be stored in
+		local intValues = Instance.new("Folder", game:GetService("ReplicatedStorage"))
+		intValues.Name = "intValues"
+	
+		local AChips = Instance.new("IntValue", intValues)
+		AChips.Name = "AChips"
+		AChips.Value = 8
+	
+		local BChips = Instance.new("IntValue", intValues)
+		BChips.Name = "BChips"
+		BChips.Value = 8
+	
+		--Creates the turn number value.
+		local turnNumber = Instance.new("IntValue", intValues)
+		turnNumber.Name = "turnNumber"
+		turnNumber.Value = 1
+	
+		-- Loads A side's assets
+		buildingGenerators.octaBuild(aSideBase, 0, "factory", "A", true)
+		buildingGenerators.octaBuild(aSideBase, 1, "barracks", "A", true)
+		turnManagement.troopSpawn(aSideBase, 3, "A", aSideBase)
+		game.workspace.currentMap.octaNodes:FindFirstChild(aSideBase):getAttribute(	
+			"ASideOccupied",
+			true
+		)
+	
+		-- Loads B side's assets
+		buildingGenerators.octaBuild(bSideBase, 0, "factory", "B", true)
+		buildingGenerators.octaBuild(bSideBase, 1, "barracks", "B", true)
+		turnManagement.troopSpawn(bSideBase, 3, "B", bSideBase)
+		game.workspace.currentMap.octaNodes:FindFirstChild(bSideBase):getAttribute(	
+			"BSideOccupied",
+			true
+		)
+	
+		--Verify proper numbers.
+		gameManagement.verifyOccupancies()
+		gameManagement.verifyTroopPopulations()
+	
+		--FIRES THE MAP CHOSEN EVENT
+		local mapChosen = game:WaitForChild("ReplicatedStorage").Events.mapChosen
+	
+		--Resets all players. (WIP)
+	
+		--Reminder this should be used when loading currencyGUI
+		mapChosen:FireAllClients()
+	
+		--Start A Side's turn
+		RepSto.Events.startTurn:FireClient(AactualPlayer)
+	
+	end
+
+	local currentMap = game.Workspace.currentMap
+
+	--Function that checks which troops are inhabiting which space.
+	--Highly important for the build mode functions
+	function gameManagement.verifyOccupancies()
+	
+		local AColor = Color3.new(255,176,0) -- Deep orange
+		local BColor = Color3.new(16,42,220)
+	
+		for i,v in pairs (currentMap.rectNodes:GetChildren()) do
+		
+			v:SetAttribute("ASideOccupied", false)
+			v:SetAttribute("BSideOccupied", false)
+		
+			if #v.PrimaryPart.Troops:GetChildren() > 0 then
+			
+				--All troops should be models.
+				local sampleTroop = v.PrimaryPart.Troops:FindFirstChildWhichIsA("Model") 
+			
+				if sampleTroop:GetAttribute("allegiance") == "A" then
+					v:SetAttribute("ASideOccupied", true)
+				elseif sampleTroop:GetAttribute("allegiance") == "B" then
+					v:SetAttribute("BSideOccupied", true)
+				end
+			
+			end
+			
+		end
+	
+		for i,v in pairs (currentMap.octaNodes:GetChildren()) do
+
+			v:SetAttribute("ASideOccupied", false)
+			v:SetAttribute("BSideOccupied", false)
+		
+			if #v.PrimaryPart.Troops:GetChildren() > 0 then
+					
+				local sampleTroop = v.PrimaryPart.Troops:FindFirstChildWhichIsA("Model")  
+				
+				if sampleTroop:GetAttribute("allegiance") == "A" then
+					v:SetAttribute("ASideOccupied", true)
+				elseif sampleTroop:GetAttribute("allegiance") == "B" then
+					v:SetAttribute("BSideOccupied", true)
+				end
+			
+			end
+
+		end
+	
+	end
+
+	--Could be discarded? Troop Populations is not heavily used here.
+	function gameManagement.verifyTroopPopulations()
+	
+		--Retrieves all the nodes.
+		for i,v in pairs (currentMap.octaNodes:GetChildren()) do
+			local troops = v.PrimaryPart.Troops:GetChildren()
+			local troopNumber = #troops
+		
+			v:SetAttribute("troopPopulation", troopNumber)
+		end
+	
+		for i,v in pairs (currentMap.rectNodes:GetChildren()) do
+			local troops = v.PrimaryPart.Troops:GetChildren()
+			local troopNumber = #troops
+
+			v:SetAttribute("troopPopulation", troopNumber) 
+		end
+
+	end
+
+	-- Checks for nodes in destruction at the end of each turn (not full-turn)
+	function gameManagement.scanDestruction()
+	
+		local destructionNodes = RepSto.destructionNodes
+	
+		--Since the game can end here, a boolean value is stored.
+		local gameEnd = false
+
+		for i,v in pairs (currentMap.octaNodes:GetChildren()) do
+		
+			--Checks when there are 3 soldiers in a node with enemy buildings.
+			if #v.PrimaryPart.Troops:GetChildren() >= 3 and v.PrimaryPart.Troops:GetChildren()[1]:GetAttribute("allegiance") ~= v:GetAttribute("sideWithBuildings") then
+			
+				local destructionNodes = RepSto.destructionNodes
+				local alreadyInDestruction = false
+			
+				--Checks if that node is already in destructionNodes
+				for j, w in pairs (destructionNodes:GetChildren()) do
+					if v.Name == w.Name then
+						alreadyInDestruction = true
+					end
+				end
+				
+				if alreadyInDestruction == true then
+					
+					for i,v in pairs (destructionNodes:GetChildren()) do
+						v.Value = v.Value + 1
+
+						if v.Value == 2 then
+
+							local nodeDestructName = v.Name
+
+							local actualNodeDestruct = currentMap.octaNodes:FindFirstChild(nodeDestructName)
+
+							for j, w in pairs (actualNodeDestruct.PrimaryPart.Buildings:GetChildren()) do
+
+								--Destroys all the buildings
+								w:Destroy()
+
+							end
+
+							--Resets all the values in a node.
+							actualNodeDestruct:SetAttribute("barrackNumber", 0)
+							actualNodeDestruct:SetAttribute("factoryNumber", 0)
+							actualNodeDestruct:SetAttribute("sideWithBuildings", "")
+
+							local baseInfo = RepSto.baseInfo
+						
+							--Checks if the node destroyed is a base.
+							if nodeDestructName == baseInfo.ASideBase.Value then
+								Events.endGame:FireAllClients()
+								Events.warning:FireAllClients("B Side wins!")
+							elseif nodeDestructName == baseInfo.BSideBase.Value then
+								Events.endGame:FireAllClients()
+								Events.warning:FireAllClients("A Side wins!")
+							end
+						end
+					end
+				
+				else 
+					local nodeAddition = Instance.new("IntValue")
+					nodeAddition.Parent = destructionNodes
+					nodeAddition.Name = v.Name 	
+					nodeAddition.Value = 1
+				
+					--Buildings on the current node start emitting smoke.
+					for j,w in pairs (v.PrimaryPart.Buildings:GetChildren()) do
+						if w then
+							if w.Name == "Factory" then
+								w["Main Building"].smokeEmitter.Enabled = true
+							elseif w.Name == "Barracks" then
+								w.Barracks.smokeEmitter.Enabled = true
+							end
+						end
+					end
+				end
+		
+			end
+		
+		end
+	
+	end
+
+	--Should be checked at every movement of a soldier. Checks if the node at any point
+	--loses its requirement to destruct.
+	function gameManagement.maintainDestruction()
+	
+		local destructionNodes = RepSto.destructionNodes
+		for i,v in pairs (destructionNodes:GetChildren()) do
+		
+			local nodeInCheck = currentMap.octaNodes:FindFirstChild(v.Name)
+		
+			if #nodeInCheck.PrimaryPart.Troops:GetChildren() < 3 then
+				v:Destroy()
+			
+				--Buildings on the current node start emitting smoke.
+				for j,w in pairs (nodeInCheck.PrimaryPart.Buildings:GetChildren()) do
+					if w then
+						if w.Name == "Factory" then
+							w["Main Building"].smokeEmitter.Enabled = false
+						elseif w.Name == "Barracks" then
+							w.Barracks.smokeEmitter.Enabled = false
+						end
+					end
+				end
+			end
+		
+		end
+	end
+
+	--Handles warning text
+	Events.warning.OnServerEvent:Connect(function(player, warningText)
+	
+		Events.warning:FireClient(player, warningText)
+		
+	end)
+
+	--Handles the revoke button's functionality which should end a troop decision essentially.
+	Events.troopDecisionEnd.OnServerEvent:Connect(function(player)
+	
+		Events.troopDecisionEnd:FireClient(player)
+		
+	end)
+	
+return gameManagement
