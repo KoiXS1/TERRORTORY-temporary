@@ -1,0 +1,24 @@
+local RulesGUI = script.Parent.Parent
+
+local EnterButton = script.Parent
+
+EnterButton.MouseButton1Click:Connect(function()
+	RulesGUI.ExitGuide.Active = true
+	RulesGUI.ExitGuide.Visible = true
+	
+	RulesGUI.Guide.Active = true
+	RulesGUI.Guide.Visible = true
+	
+	EnterButton.Active = false
+	EnterButton.Visible = false
+end)
+
+EnterButton.MouseEnter:Connect(function()
+	EnterButton.ImageTransparency = 0.75
+	EnterButton.Transparency = 0.75
+end)
+
+EnterButton.MouseLeave:Connect(function()
+	EnterButton.ImageTransparency = 0
+	EnterButton.Transparency = 0
+end)
