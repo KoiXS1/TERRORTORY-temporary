@@ -194,6 +194,8 @@ local gameManagement = {}
 		end
 
 	end
+	
+	local fireThread
 
 	-- Checks for nodes in destruction at the end of each turn (not full-turn)
 	function gameManagement.scanDestruction()
@@ -229,6 +231,10 @@ local gameManagement = {}
 
 							local actualNodeDestruct = currentMap.octaNodes:FindFirstChild(nodeDestructName)
 
+							coroutine.close(fireThread)
+							actualNodeDestruct.Sounds.fire:Pause()
+							actualNodeDestruct.Sounds.collapse:Play()
+
 							for j, w in pairs (actualNodeDestruct.PrimaryPart.Buildings:GetChildren()) do
 
 								--Destroys all the buildings
@@ -262,11 +268,30 @@ local gameManagement = {}
 				
 					--Buildings on the current node start emitting smoke.
 					for j,w in pairs (v.PrimaryPart.Buildings:GetChildren()) do
+						
+						local function fireSound()
+							v.Sounds.fire:Play()
+							task.wait(43)
+						end
+						
+						fireThread = coroutine.create(fireSound)
+						coroutine.resume(fireThread)
+						
 						if w then
 							if w.Name == "Factory" then
+								
 								w["Main Building"].smokeEmitter.Enabled = true
+								
+								--Nullifies functionality of factories in peril.
+								v:SetAttribute("factoryNumber", v:GetAttribute("factoryNumber") - 1)
+								
 							elseif w.Name == "Barracks" then
+								
 								w.Barracks.smokeEmitter.Enabled = true
+								
+								--Nullifies functionality of barracks in peril.
+								v:SetAttribute("barrackNumber", v:GetAttribute("barrackNumber") - 1)
+								
 							end
 						end
 					end
@@ -293,11 +318,26 @@ local gameManagement = {}
 				--Buildings on the current node start emitting smoke.
 				for j,w in pairs (nodeInCheck.PrimaryPart.Buildings:GetChildren()) do
 					if w then
+						
+						coroutine.close(fireThread)
+						nodeInCheck.Sounds.fire:Pause()
+						
 						if w.Name == "Factory" then
+							
 							w["Main Building"].smokeEmitter.Enabled = false
+							
+							--Adds back functionality of rescued factories
+							nodeInCheck:SetAttribute("factoryNumber", nodeInCheck:GetAttribute("factoryNumber") + 1)
+							
 						elseif w.Name == "Barracks" then
+							
 							w.Barracks.smokeEmitter.Enabled = false
+							
+							--Adds back functionality of rescued barracks
+							nodeInCheck:SetAttribute("barrackNumber", nodeInCheck:GetAttribute("barrackNumber") + 1)
+							
 						end
+						
 					end
 				end
 			end
