@@ -1,0 +1,48 @@
+--Script that is in charge of environmental sounds
+local RepSto = game:GetService("ReplicatedStorage")
+globalSounds = RepSto["Global Sounds"]
+
+--Creates the ambience of the rain.
+globalSounds.Rain:Play()
+
+--Create the ambience of the wind
+--Should play every 60 - 90 seconds
+local function windPlay()
+	while (true) do
+		globalSounds.Wind:Play()
+		
+		repeat
+			globalSounds.Wind.Volume = globalSounds.Wind.Volume - 0.005
+			task.wait(9.02/100)
+		until globalSounds.Wind.Volume <= 0
+		globalSounds.Wind.Volume = 0.5
+		
+		local waitTime = 75 - math.random(0,30)
+		task.wait(waitTime)
+	end
+end
+
+local windThread = coroutine.create(windPlay)
+coroutine.resume(windThread)
+
+--Create the ambience of raven caws
+--Should play ever 180 to 300 seconds
+local function ravenPlay()
+	while true do
+		globalSounds.Ravens:Play()
+		
+		repeat
+			globalSounds.Ravens.Volume = globalSounds.Ravens.Volume - 0.005
+			task.wait(5.4/100)
+		until globalSounds.Ravens.Volume <= 0
+	
+		globalSounds.Ravens:Stop()
+		globalSounds.Ravens.Volume = 0.5
+		
+		local waitTime = 300 - math.random(0,120)
+		task.wait(waitTime)
+	end
+end
+
+local ravenThread = coroutine.create(ravenPlay)
+coroutine.resume(ravenThread)
