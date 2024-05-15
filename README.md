@@ -2,7 +2,9 @@ This repository contains text files that are directly copy and pasted from my ow
 
 Code version: FOREST UPDATE v1.0
 
-The game: https://www.roblox.com/games/17497088320/TERRORTORY-FOREST-UPDATE-v1-0 
+Public version (NEW): https://www.roblox.com/games/17497088320/TERRORTORY-FOREST-UPDATE-v1-0 
+
+Testing place (for tweaking): https://www.roblox.com/games/15360296565/TERRORTORY-TESTING 
 
 --DIRECTORY PURPOSES-
 * ServerSideService serves as the directory for scripts that only work for the server-side of the game.
