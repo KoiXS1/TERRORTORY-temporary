@@ -1,5 +1,6 @@
 This repository contains text files that are directly copy and pasted from my own source code in ROBLOX Studio.
-The game: https://www.roblox.com/games/15360296565/TERRORTORY
+Code version: FOREST UPDATE v1.0
+The game: https://www.roblox.com/games/17497088320/TERRORTORY-FOREST-UPDATE-v1-0 
 
 --DIRECTORY PURPOSES-
 * ServerSideService serves as the directory for scripts that only work for the server-side of the game.
