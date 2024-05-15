@@ -132,8 +132,8 @@ local turnManagement = {}
 		end
 
 		spawnNode.Parent:SetAttribute(
-				"troopPopulation",
-				spawnNode.Parent:GetAttribute("troopPopulation") + 1
+			"troopPopulation",
+			spawnNode.Parent:GetAttribute("troopPopulation") + 1
 		)
 	
 		local buildingGenerator = require(RepSto.buildingGenerator)
@@ -375,7 +375,6 @@ local turnManagement = {}
 				
 			end
 	
-
 			Events.temporaryDisableInteraction:FireClient(disabledPlayer, 2)
 			wait(1.3)
 
@@ -422,8 +421,19 @@ local turnManagement = {}
 				spawnNode.Color = spawnNode.Parent:GetAttribute("lastTeamColor")
 			end
 			
-			if (nodeName ~= previousNode) then
+			if (nodeName ~= previousNode) then         --indicative of movement
 				newSoldier1.Sounds.soldierSteps:Play()
+			else                                       --indicative of a spawn
+				
+				--Deactivates click detectors for B-side soldiers since upon spawning, it will be side A's turn
+				--and therefore, B cannot move.
+				if (side == "B") then
+					newSoldier1.ClickDetector.MaxActivationDistance = 0
+					if (troopSpawns == 2) then
+						newSoldier2.ClickDetector.MaxActivationDistance = 0
+					end		
+				end
+				
 			end
 		
 		end
@@ -467,6 +477,9 @@ local turnManagement = {}
 		local ASidePlayer = Teams.A:GetPlayers()[1]
 		local BSidePlayer = Teams.B:GetPlayers()[1]
 		
+		local gameManagement = require(RepSto.gameManagement)
+		gameManagement.scanDestruction()
+		
 		if playerEnd.Team == Teams.A then
 			
 			Events.startTurn:FireClient(BSidePlayer)
@@ -476,7 +489,7 @@ local turnManagement = {}
 			
 			-- Hands out the payments & implements the factory's functionality.
 			turnManagement.turnPayments()
-		
+			
 			--Generates a troop for each barrack when the next turn is an even number.
 			if RepSto:WaitForChild("intValues").turnNumber.Value % 2 == 1 then
 
@@ -494,7 +507,6 @@ local turnManagement = {}
 							turnManagement.troopSpawn(v.Name, barrackNumber, "B", v.Name)
 						end
 					
-						local gameManagement = require(RepSto.gameManagement)
 						gameManagement.verifyOccupancies()
 						gameManagement.verifyTroopPopulations()
 					
@@ -513,9 +525,6 @@ local turnManagement = {}
 			Events.startTurn:FireClient(ASidePlayer)
 		
 		end
-	
-		local gameManagement = require(RepSto.gameManagement)
-		gameManagement.scanDestruction()
 		
 	end)
 
